@@ -1,25 +1,23 @@
 import asyncio
 import io
 from pathlib import Path
-from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, UploadFile, concurrency
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from app.common.authentication import protected_route
 from app.common.dependencies import AuthCredentialDepend
 import logging
-from app.common.websocket import WebsocketEventResult
 from app.common.enums import SystemRole
 from typing import List
-from langchain.prompts import PromptTemplate
 from pydub import AudioSegment
-from langchain.memory import ConversationBufferWindowMemory
 
 from rag.schemas import QuestionSchema
-from rag.llm import LLM_chain
 from rag.rag import rag_chain
-from rag.chroma_db import ChromaDB, SearchTypeEnums
-from rag.utils import parse_memory_history, save_file
-from rag.prompt import CONTEXT, PROMPT_TEMPLATE, QUESTION
+from rag.chroma_db import ChromaDB
+from rag.utils import save_file
 from rag.pho_whisper import transcriber
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 
 router = APIRouter()
@@ -27,7 +25,7 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-BASE_UPLOAD_DIR = Path("uploads")
+BASE_UPLOAD_DIR = Path(f"{os.environ.get('ROOT_PATH')}/uploads")
 BASE_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
